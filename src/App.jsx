@@ -9,8 +9,6 @@ const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY; // your TMDB API key
 console.log("TMDB API KEY:", API_KEY);
 
-// CORS proxy for bypassing browser restrictions
-const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,9 +31,7 @@ const App = () => {
       :`${API_BASE_URL}/discover/movie?sort_by=popularity.desc&api_key=${API_KEY}`;
 
 
-      const proxyUrl = `${CORS_PROXY}${encodeURIComponent(tmdbUrl)}`;
-
-      const response = await fetch(proxyUrl);
+      const response = await fetch(tmdbUrl);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
