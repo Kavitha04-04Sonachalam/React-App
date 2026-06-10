@@ -1,12 +1,18 @@
-# React + Vite
+🎥 React Movie Search App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based Movie Search Application where you can search for movies, view top 5 trending movies, and explore details fetched from TMDB API.
+Built using React + Vite, Tailwind CSS for styling, and Appwrite to manage trending movie data.
 
-Currently, two official plugins are available:
+🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🔍 Movie Search – Search movies instantly using TMDB API
 
-## Expanding the ESLint configuration
+📈 Top 5 Trending Movies – Always displays the latest 5 trending movies stored in Appwrite
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+⚡ Fast Performance – Built using Vite for optimized speed
+
+🎨 Responsive UI – Works perfectly on mobile, tablet, and desktop
+
+🔄 Real-Time Trending – Updates automatically when you search new movies
+
+🛠 Error Handling – Displays proper messages when movies are not found
