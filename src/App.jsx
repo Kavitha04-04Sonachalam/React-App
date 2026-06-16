@@ -54,7 +54,7 @@ const App = () => {
     }
   } catch (error) {
       console.error(`Error fetching movies: ${error}`);
-      setErrorMessage("Error fetching movies");
+      setErrorMessage(`Error fetching movies: ${error.message || error}`);
     } finally {
       setIsLoading(false);
     }
