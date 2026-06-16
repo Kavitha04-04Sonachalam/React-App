@@ -10,7 +10,7 @@ const API_KEY = import.meta.env.VITE_TMDB_API_KEY; // your TMDB API key
 console.log("TMDB API KEY:", API_KEY);
 
 
-const fetchWithTimeout = async (url, options = {}, timeout = 5000) => {
+const fetchWithTimeout = async (url, options = {}, timeout = 10000) => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   try {
@@ -19,6 +19,9 @@ const fetchWithTimeout = async (url, options = {}, timeout = 5000) => {
     return response;
   } catch (error) {
     clearTimeout(id);
+    if (error.name === 'AbortError') {
+      throw new Error(`Request timeout after ${timeout}ms - TMDB API is slow to respond`);
+    }
     throw error;
   }
 };
@@ -38,20 +41,20 @@ const App = () => {
     setErrorMessage("");
 
     try {
-      // Use query parameter API key instead of Authorization header
-      const tmdbUrl = query
-      ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&api_key=${API_KEY}`
-      :`${API_BASE_URL}/discover/movie?sort_by=popularity.desc&api_key=${API_KEY}`;
-
+      const url = query
+        ? `/api/movies?query=${encodeURIComponent(query)}`
+        : `/api/movies`;
 
       let response;
       try {
-        // Try direct fetch with a 5-second timeout
+        // Try fetching via our Vercel API proxy first (10s timeout)
+        response = await fetchWithTimeout(url, {}, 10000);
+      } catch (proxyError) {
+        console.warn("API proxy fetch failed or timed out, falling back to direct TMDB fetch...", proxyError);
+        const tmdbUrl = query
+          ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&api_key=${API_KEY}`
+          : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&api_key=${API_KEY}`;
         response = await fetchWithTimeout(tmdbUrl, {}, 5000);
-      } catch (directError) {
-        console.warn("Direct TMDB fetch failed or timed out, retrying via CORS proxy...", directError);
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(tmdbUrl)}`;
-        response = await fetchWithTimeout(proxyUrl, {}, 10000);
       }
 
       if (!response.ok) {
