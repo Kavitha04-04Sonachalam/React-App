@@ -10,6 +10,19 @@ const API_KEY = import.meta.env.VITE_TMDB_API_KEY; // your TMDB API key
 console.log("TMDB API KEY:", API_KEY);
 
 
+const fetchWithTimeout = async (url, options = {}, timeout = 5000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+};
+
 const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -31,7 +44,15 @@ const App = () => {
       :`${API_BASE_URL}/discover/movie?sort_by=popularity.desc&api_key=${API_KEY}`;
 
 
-      const response = await fetch(tmdbUrl);
+      let response;
+      try {
+        // Try direct fetch with a 5-second timeout
+        response = await fetchWithTimeout(tmdbUrl, {}, 5000);
+      } catch (directError) {
+        console.warn("Direct TMDB fetch failed or timed out, retrying via CORS proxy...", directError);
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(tmdbUrl)}`;
+        response = await fetchWithTimeout(proxyUrl, {}, 10000);
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
